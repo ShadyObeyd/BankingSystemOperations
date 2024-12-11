@@ -89,7 +89,7 @@ public class TransactionsService : ITransactionsService
         {
             CreateDate = DateTime.ParseExact(t.Element("CreateDate").Value, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal),
             Direction = char.TryParse(t.Element("Amount").Element("Direction").Value, out char direction) ? direction : ' ',
-            Amount = decimal.TryParse(t.Element("Amount").Element("Value").Value, out decimal amount) ? amount : 0,
+            Amount = decimal.TryParse(t.Element("Amount").Element("Value").Value, CultureInfo.InvariantCulture, out decimal amount) ? amount : 0,
             Currency = t.Element("Amount")?.Element("Currency").Value,
             DeptorIBAN = t.Element("Debtor")?.Element("IBAN")?.Value,
             BeneficiaryIBAN = t.Element("Beneficiary")?.Element("IBAN")?.Value ?? string.Empty,
