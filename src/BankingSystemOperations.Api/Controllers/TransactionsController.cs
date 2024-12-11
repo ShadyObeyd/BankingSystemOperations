@@ -48,7 +48,7 @@ public class TransactionsController : ControllerBase
 
         if (string.IsNullOrEmpty(csvData))
         {
-            return BadRequest("No transactions to export");
+            return NotFound("No transactions to export");
         }
         
         var fileBytes = Encoding.UTF8.GetBytes(csvData);
