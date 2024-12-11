@@ -18,7 +18,7 @@ public class Transaction : BaseEntity
     [Required]
     [MinLength(3)]
     [MaxLength(3)]
-    public string? Currency { get; set; }
+    public string Currency { get; set; }
     
     [Required]
     [MinLength(15)]

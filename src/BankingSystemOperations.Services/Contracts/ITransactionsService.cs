@@ -11,4 +11,6 @@ public interface ITransactionsService
     IEnumerable<TransactionDto?> ReadXML(IFormFile file);
 
     Task<string> ExportTransactionsToCsvAsync();
+    
+    Task<TransactionDto> GetTransactionByIdAsync(Guid transactionId);
 }

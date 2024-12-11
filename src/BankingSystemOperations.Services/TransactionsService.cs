@@ -119,4 +119,28 @@ public class TransactionsService : ITransactionsService
 
         return csvFormat.ToString().Trim();
     }
+
+    public async Task<TransactionDto> GetTransactionByIdAsync(Guid transactionId)
+    {
+        var transaction = await _context.Transactions.FirstOrDefaultAsync(x => x.Id == transactionId);
+
+        if (transaction is null)
+        {
+            return null;
+        }
+
+        return new TransactionDto
+        {
+            Id = transaction.Id,
+            CreateDate = transaction.CreateDate,
+            Direction = transaction.Direction,
+            Amount = transaction.Amount,
+            Currency = transaction.Currency,
+            DeptorIBAN = transaction.DeptorIBAN,
+            BeneficiaryIBAN = transaction.BeneficiaryIBAN,
+            Status = transaction.Status,
+            ExternalId = transaction.ExternalId,
+            MerchantId = transaction.MerchantId
+        };
+    }
 }

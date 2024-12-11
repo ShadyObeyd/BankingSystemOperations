@@ -49,4 +49,17 @@ public class TransactionsController : ControllerBase
         
         return File(fileBytes, "text/csv", "Transactions.csv");
     }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetTransactionById(Guid id)
+    {
+        var transaction = await _transactionsService.GetTransactionByIdAsync(id);
+
+        if (transaction is null)
+        {
+            return NotFound("No transaction found");
+        }
+
+        return Ok(transaction);
+    }
 }
