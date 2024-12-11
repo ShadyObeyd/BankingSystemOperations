@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BankingSystemOperations.Data.Dtos;
+using BankingSystemOperations.Services.Filters;
 using BankingSystemOperations.Services.Results;
 using Microsoft.AspNetCore.Http;
 
@@ -15,5 +16,5 @@ public interface ITransactionsService
     
     Task<TransactionDto> GetTransactionByIdAsync(Guid transactionId);
     
-    Task<PaginatedList<TransactionDto>> GetTransactionsAsync(int pageNumber, int pageSize);
+    Task<PaginatedList<TransactionDto>> GetTransactionsAsync(int pageNumber, int pageSize, TransactionFilter filter);
 }

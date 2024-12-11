@@ -9,6 +9,7 @@ using BankingSystemOperations.Data.Entities.Enums;
 using BankingSystemOperations.Data.Mappers;
 using BankingSystemOperations.Data.Validators;
 using BankingSystemOperations.Services.Contracts;
+using BankingSystemOperations.Services.Filters;
 using BankingSystemOperations.Services.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -124,16 +125,27 @@ public class TransactionsService : ITransactionsService
         return TransactionsMapper.ToDto(transaction);
     }
 
-    public async Task<PaginatedList<TransactionDto>> GetTransactionsAsync(int pageNumber, int pageSize)
-    {   
-        int count = await _context.Transactions.CountAsync();
+    public async Task<PaginatedList<TransactionDto>> GetTransactionsAsync(int pageNumber, int pageSize, TransactionFilter filter)
+    {
+        IQueryable<Transaction> query;
+
+        if (filter is null)
+        {
+            query = _context.Transactions.AsQueryable();
+        }
+        else
+        {
+            query = GetFilteredTransactionsAsync(filter);
+        }
+
+        int count = await query.CountAsync();
 
         if (count == 0)
         {
             return null;
         }
         
-        var transactions = await _context.Transactions
+        var transactions = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(t => TransactionsMapper.ToDto(t))
@@ -145,5 +157,39 @@ public class TransactionsService : ITransactionsService
             TotalPages = (int)Math.Ceiling((double)count / pageSize),
             Items = transactions
         };
+    }
+
+    private IQueryable<Transaction> GetFilteredTransactionsAsync(TransactionFilter filter)
+    {
+        var query = _context.Transactions.AsQueryable();
+
+        if (filter.CreateDateFrom.HasValue)
+            query = query.Where(t => t.CreateDate >= filter.CreateDateFrom.Value);
+
+        if (filter.CreateDateTo.HasValue)
+            query = query.Where(t => t.CreateDate <= filter.CreateDateTo.Value);
+
+        if (filter.Direction.HasValue)
+            query = query.Where(t => t.Direction.ToString().ToLower() == filter.Direction.Value.ToString().ToLower());
+
+        if (filter.AmountMin.HasValue)
+            query = query.Where(t => t.Amount >= filter.AmountMin.Value);
+
+        if (filter.AmountMax.HasValue)
+            query = query.Where(t => t.Amount <= filter.AmountMax.Value);
+
+        if (!string.IsNullOrEmpty(filter.Currency))
+            query = query.Where(t => t.Currency.ToLower() == filter.Currency.ToLower());
+
+        if (!string.IsNullOrEmpty(filter.DeptorIBAN))
+            query = query.Where(t => t.DeptorIBAN == filter.DeptorIBAN);
+
+        if (!string.IsNullOrEmpty(filter.BeneficiaryIBAN))
+            query = query.Where(t => t.BeneficiaryIBAN == filter.BeneficiaryIBAN);
+
+        if (filter.Status.HasValue)
+            query = query.Where(t => t.Status == filter.Status.Value);
+
+        return query;
     }
 }

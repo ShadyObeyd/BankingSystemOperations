@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using BankingSystemOperations.Services.Contracts;
+using BankingSystemOperations.Services.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystemOperations.Api.Controllers;
@@ -16,14 +17,19 @@ public class TransactionsController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetTransactions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetTransactions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] TransactionFilter filter = null)
     {
         if (pageNumber <= 0 || pageSize <= 0)
         {
             return BadRequest("Invalid page number or page size");
         }
         
-        var transactions = await _transactionsService.GetTransactionsAsync(pageNumber, pageSize);
+        var transactions = await _transactionsService.GetTransactionsAsync(pageNumber, pageSize, filter);
+
+        if (transactions == null || transactions?.Items.Count() == 0)
+        {
+            return NotFound("No transactions found");
+        }
 
         return Ok(transactions);
     }
