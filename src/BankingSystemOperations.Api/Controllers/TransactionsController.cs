@@ -1,4 +1,5 @@
-﻿using BankingSystemOperations.Services.Contracts;
+﻿using System.Text;
+using BankingSystemOperations.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystemOperations.Api.Controllers;
@@ -24,7 +25,7 @@ public class TransactionsController : ControllerBase
 
         var dtos = _transactionsService.ReadXML(file);
 
-        var result = await _transactionsService.InsertTransactions(dtos);
+        var result = await _transactionsService.InsertTransactionsAsync(dtos);
 
         if (!string.IsNullOrEmpty(result?.ErrorMessage))
         {
@@ -32,5 +33,20 @@ public class TransactionsController : ControllerBase
         }
         
         return Ok();
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> ExportCsv()
+    {
+        var csvData = await _transactionsService.ExportTransactionsToCsvAsync();
+
+        if (string.IsNullOrEmpty(csvData))
+        {
+            return BadRequest("No transactions to export");
+        }
+        
+        var fileBytes = Encoding.UTF8.GetBytes(csvData);
+        
+        return File(fileBytes, "text/csv", "Transactions.csv");
     }
 }

@@ -22,7 +22,7 @@ public class TransactionsService : ITransactionsService
         _context = context;
     }
 
-    public async Task<ValidationResult> InsertTransactions(IEnumerable<TransactionDto> transactionDtos)
+    public async Task<ValidationResult> InsertTransactionsAsync(IEnumerable<TransactionDto> transactionDtos)
     {
         var validator = new TransactionsValidator();
         
@@ -72,7 +72,6 @@ public class TransactionsService : ITransactionsService
                 }
             }
             
-            
             await _context.Transactions.AddAsync(transaction);
             await _context.SaveChangesAsync();
         }
@@ -98,5 +97,26 @@ public class TransactionsService : ITransactionsService
         }).ToList();
 
         return transactions;
+    }
+
+    public async Task<string> ExportTransactionsToCsvAsync()
+    {
+        var transactions = await _context.Transactions.ToListAsync();
+
+        if (transactions is null || transactions.Count == 0)
+        {
+            return string.Empty;
+        }
+        
+        StringBuilder csvFormat = new();
+        
+        csvFormat.AppendLine("Id,CreateDate,Direction,Amount,Currency,DeptorIBAN,BeneficiaryIBAN,Status,ExternalId,MerchantId");
+        
+        foreach (var transaction in transactions)
+        {
+            csvFormat.AppendLine($"{transaction.Id},{transaction.CreateDate},{transaction.Direction},{transaction.Amount},{transaction.Currency},{transaction.DeptorIBAN},{transaction.BeneficiaryIBAN},{(byte)transaction.Status},{transaction.ExternalId},{transaction.MerchantId}");
+        }
+
+        return csvFormat.ToString().Trim();
     }
 }

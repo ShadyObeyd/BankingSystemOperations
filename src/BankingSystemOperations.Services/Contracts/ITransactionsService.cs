@@ -6,7 +6,9 @@ namespace BankingSystemOperations.Services.Contracts;
 
 public interface ITransactionsService
 {
-    Task<ValidationResult> InsertTransactions(IEnumerable<TransactionDto> transactionDtos);
+    Task<ValidationResult> InsertTransactionsAsync(IEnumerable<TransactionDto> transactionDtos);
     
     IEnumerable<TransactionDto?> ReadXML(IFormFile file);
+
+    Task<string> ExportTransactionsToCsvAsync();
 }
