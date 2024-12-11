@@ -6,8 +6,10 @@ using BankingSystemOperations.Data;
 using BankingSystemOperations.Data.Dtos;
 using BankingSystemOperations.Data.Entities;
 using BankingSystemOperations.Data.Entities.Enums;
+using BankingSystemOperations.Data.Mappers;
 using BankingSystemOperations.Data.Validators;
 using BankingSystemOperations.Services.Contracts;
+using BankingSystemOperations.Services.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,17 +51,7 @@ public class TransactionsService : ITransactionsService
                 return new ValidationResult(sb.ToString().Trim());
             }
 
-            var transaction = new Transaction
-            {
-                CreateDate = dto.CreateDate,
-                Direction = dto.Direction,
-                Amount = dto.Amount,
-                Currency = dto.Currency,
-                DeptorIBAN = dto.DeptorIBAN,
-                BeneficiaryIBAN = dto.BeneficiaryIBAN,
-                Status = dto.Status,
-                ExternalId = dto.ExternalId,
-            };
+            var transaction = TransactionsMapper.ToEntity(dto);
 
             if (dto.MerchantId.HasValue)
             {
@@ -129,18 +121,29 @@ public class TransactionsService : ITransactionsService
             return null;
         }
 
-        return new TransactionDto
+        return TransactionsMapper.ToDto(transaction);
+    }
+
+    public async Task<PaginatedList<TransactionDto>> GetTransactionsAsync(int pageNumber, int pageSize)
+    {   
+        int count = await _context.Transactions.CountAsync();
+
+        if (count == 0)
         {
-            Id = transaction.Id,
-            CreateDate = transaction.CreateDate,
-            Direction = transaction.Direction,
-            Amount = transaction.Amount,
-            Currency = transaction.Currency,
-            DeptorIBAN = transaction.DeptorIBAN,
-            BeneficiaryIBAN = transaction.BeneficiaryIBAN,
-            Status = transaction.Status,
-            ExternalId = transaction.ExternalId,
-            MerchantId = transaction.MerchantId
+            return null;
+        }
+        
+        var transactions = await _context.Transactions
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(t => TransactionsMapper.ToDto(t))
+            .ToListAsync();
+
+        return new PaginatedList<TransactionDto>
+        {
+            TotalCount = count,
+            TotalPages = (int)Math.Ceiling((double)count / pageSize),
+            Items = transactions
         };
     }
 }
