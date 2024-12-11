@@ -15,14 +15,14 @@ public class TransactionsController : ControllerBase
         _transactionsService = transactionsService;
     }
     
-    [HttpPost]
+    [HttpPost("ImportXml")]
     public async Task<IActionResult> ImportXML(IFormFile? file)
     {
         if (file == null || file.Length == 0)
         {
             return BadRequest("Invalid file");
         }
-
+    
         var dtos = _transactionsService.ReadXML(file);
 
         var result = await _transactionsService.InsertTransactionsAsync(dtos);
@@ -35,7 +35,7 @@ public class TransactionsController : ControllerBase
         return Ok();
     }
     
-    [HttpGet]
+    [HttpGet("ExportCsv")]
     public async Task<IActionResult> ExportCsv()
     {
         var csvData = await _transactionsService.ExportTransactionsToCsvAsync();
