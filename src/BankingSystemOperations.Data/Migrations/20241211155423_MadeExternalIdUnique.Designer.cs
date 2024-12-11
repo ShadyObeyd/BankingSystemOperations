@@ -4,6 +4,7 @@ using BankingSystemOperations.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BankingSystemOperations.Data.Migrations
 {
     [DbContext(typeof(BankingOperationsContext))]
-    partial class BankingOperationsContextModelSnapshot : ModelSnapshot
+    [Migration("20241211155423_MadeExternalIdUnique")]
+    partial class MadeExternalIdUnique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

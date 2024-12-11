@@ -16,10 +16,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BankingSystemOperations.Data\BankingSystemOperations.Data.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Controllers\" />
+      <ProjectReference Include="..\BankingSystemOperations.Services\BankingSystemOperations.Services.csproj" />
     </ItemGroup>
 
 </Project>

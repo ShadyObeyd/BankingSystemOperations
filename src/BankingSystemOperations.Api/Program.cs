@@ -1,4 +1,6 @@
 using BankingSystemOperations.Data;
+using BankingSystemOperations.Services;
+using BankingSystemOperations.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,8 @@ builder.Services.AddDbContext<BankingOperationsContext>(o =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<ITransactionsService, TransactionsService>();
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BankingSystemOperations.Data.Entities.Enums;
 
 namespace BankingSystemOperations.Data.Entities;
 
@@ -8,8 +9,7 @@ public class Transaction : BaseEntity
     public DateTime CreateDate { get; set; }
     
     [Required]
-    [MinLength(1)]
-    [MaxLength(1)]
+    [RegularExpression("^[DC]$")]
     public char Direction { get; set; }
     
     [Range(typeof(decimal),"0", "79228162514264337593543950335")]
@@ -30,8 +30,8 @@ public class Transaction : BaseEntity
     [MaxLength(34)]
     public string BeneficiaryIBAN { get; set; }
     
-    [Range(0, 1)]
-    public byte Status { get; set; }
+    [Required]
+    public TransactionStatus? Status { get; set; }
     
     [Required]
     [MinLength(MinLength)]

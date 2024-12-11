@@ -12,4 +12,13 @@ public class BankingOperationsContext : DbContext
     public DbSet<Merchant> Merchants { get; set; }
 
     public DbSet<Transaction> Transactions { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Transaction>()
+            .HasIndex(t => t.ExternalId)
+            .IsUnique();
+        
+        base.OnModelCreating(modelBuilder);
+    }
 }
