@@ -12,5 +12,5 @@ public interface IPartnersService
 
     Task<string> PreparePartnersForCsvExportAsync();
     
-    Task<ValidationResult> InsertPartnerAsync(PartnerDto partner);
+    Task<ValidationResult> InsertPartnerAsync(PartnerDto dto);
 }

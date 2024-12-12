@@ -1,4 +1,6 @@
-﻿using BankingSystemOperations.Services.Contracts;
+﻿using System.Text;
+using BankingSystemOperations.Data.Dtos;
+using BankingSystemOperations.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystemOperations.Api.Controllers;
@@ -15,7 +17,7 @@ public class PartnersController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetPartners(int page = 1, int pageSize = 10)
+    public async Task<IActionResult> GetPartners([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var partners = await _partnersService.GetPartnersAsync(page, pageSize);
 
@@ -43,13 +45,28 @@ public class PartnersController : ControllerBase
     [HttpGet("ExportCsv")]
     public async Task<IActionResult> ExportCsv()
     {
-        var csv = await _partnersService.PreparePartnersForCsvExportAsync();
+        var csvData = await _partnersService.PreparePartnersForCsvExportAsync();
 
-        if (string.IsNullOrEmpty(csv))
+        if (string.IsNullOrEmpty(csvData))
         {
             return NotFound("No partners to export");
         }
+        
+        var fileBytes = Encoding.UTF8.GetBytes(csvData);
 
-        return File(csv, "text/csv", "Partners.csv");
+        return File(fileBytes, "text/csv", "Partners.csv");
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> CreatePartner([FromBody] PartnerDto dto)
+    {
+        var result = await _partnersService.InsertPartnerAsync(dto);
+
+        if (result?.ErrorMessage is not null)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        
+        return Created();
     }
 }

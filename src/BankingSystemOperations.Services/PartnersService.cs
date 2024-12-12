@@ -2,6 +2,7 @@
 using BankingSystemOperations.Data;
 using BankingSystemOperations.Data.Dtos;
 using BankingSystemOperations.Data.Mappers;
+using BankingSystemOperations.Data.Validators;
 using BankingSystemOperations.Services.Contracts;
 using BankingSystemOperations.Services.Results;
 using Microsoft.EntityFrameworkCore;
@@ -68,8 +69,27 @@ public class PartnersService : IPartnersService
         return csvFormat;
     }
 
-    public Task<ValidationResult> InsertPartnerAsync(PartnerDto partner)
+    public async Task<ValidationResult> InsertPartnerAsync(PartnerDto dto)
     {
-        throw new NotImplementedException();
+        if (dto is null)
+        {
+            return new ValidationResult("Invalid partner");
+        }
+
+        var validator = new PartnersValidator();
+        var validationResult = await validator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage);
+            return new ValidationResult(string.Join(Environment.NewLine, errors));
+        }
+
+        var partner = PartnersMapper.ToEntity(dto);
+        
+        await _context.Partners.AddAsync(partner);
+        await _context.SaveChangesAsync();
+        
+        return ValidationResult.Success;
     }
 }

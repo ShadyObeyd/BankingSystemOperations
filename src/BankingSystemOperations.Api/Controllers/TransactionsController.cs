@@ -79,6 +79,6 @@ public class TransactionsController : ControllerBase
             return BadRequest(result.ErrorMessage);
         }
         
-        return Ok();
+        return Created();
     }
 }

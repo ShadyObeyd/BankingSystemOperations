@@ -40,7 +40,7 @@ public class TransactionsService : ITransactionsService
                 return new ValidationResult($"Transaction with external Id: {dto.ExternalId} already exists.");
             }
             
-            var result = validator.Validate(dto);
+            var result = await validator.ValidateAsync(dto);
 
             if (!result.IsValid)
             {
