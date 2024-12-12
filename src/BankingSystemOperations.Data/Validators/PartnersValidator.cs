@@ -10,6 +10,7 @@ public class PartnersValidator : AbstractValidator<PartnerDto>
         RuleFor(p => p.Name)
             .NotEmpty()
             .NotNull()
-            .Length(2, 100);
+            .Length(2, 100)
+            .WithMessage("Name must be between 2 and 100 letters.");
     }
 }

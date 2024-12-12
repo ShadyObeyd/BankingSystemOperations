@@ -15,6 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ITransactionsService, TransactionsService>();
 builder.Services.AddScoped<IPartnersService, PartnersService>();
 builder.Services.AddScoped<ICsvService, CsvService>();
+builder.Services.AddScoped<IMerchantsService, MerchantsService>();
 
 var app = builder.Build();
 
