@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using BankingSystemOperations.Data.Dtos;
 using BankingSystemOperations.Services.Contracts;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystemOperations.Api.Controllers;
@@ -73,5 +74,28 @@ public class MerchantsController : ControllerBase
         }
 
         return Created();
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> UpdateMerchant([FromBody] MerchantDto merchantDto)
+    {
+        if (merchantDto is null)
+        {
+            return BadRequest("Invalid input");
+        }
+
+        if (!merchantDto.Id.HasValue)
+        {
+            return BadRequest("Ivalid merchant id");
+        }
+        
+        var result = await _merchantsService.UpdateMerchantAsync(merchantDto);
+
+        if (!string.IsNullOrEmpty(result?.ErrorMessage))
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+
+        return Ok();
     }
 }

@@ -107,7 +107,44 @@ public class MerchantsService : IMerchantsService
 
     public async Task<ValidationResult> UpdateMerchantAsync(MerchantDto dto)
     {
-        throw new NotImplementedException();
+        if (dto is null)
+        {
+            return new ValidationResult("Invalid merchant");
+        }
+
+        var validator = new MerchantsValidator();
+
+        var validationResult = await validator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors.Select(x => x.ErrorMessage);
+            return new ValidationResult(string.Join(Environment.NewLine, errors));
+        }
+
+        if (!dto.Id.HasValue)
+        {
+            return new ValidationResult("Invalid merchant id");
+        }
+        
+        var merchant = await _context.Merchants.FindAsync(dto.Id.Value);
+
+        if (merchant is null)
+        {
+            return new ValidationResult("Merchant not found");
+        }
+        
+        merchant.Name = dto.Name;
+        merchant.BoardingDate = dto.BoardingDate;
+        merchant.Url = dto.Url;
+        merchant.Country = dto.Country;
+        merchant.FirstAddress = dto.FirstAddress;
+        merchant.SecondAddress = dto.SecondAddress;
+
+        _context.Update(merchant);
+        await _context.SaveChangesAsync();
+        
+        return ValidationResult.Success;
     }
 
     public async Task<ValidationResult> DeleteMerchantAsync(Guid merchantId)
