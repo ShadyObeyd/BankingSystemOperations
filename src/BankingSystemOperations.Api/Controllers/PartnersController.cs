@@ -26,4 +26,17 @@ public class PartnersController : ControllerBase
         
         return Ok(partners);
     }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetPartnerById(Guid id)
+    {
+        var partner = await _partnersService.GetPartnerByIdAsync(id);
+
+        if (partner is null)
+        {
+            return NotFound("Partner not found");
+        }
+        
+        return Ok(partner);
+    }
 }

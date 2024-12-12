@@ -45,9 +45,16 @@ public class PartnersService : IPartnersService
         };
     }
 
-    public Task<PartnerDto> GetPartnerByIdAsync(Guid id)
+    public async Task<PartnerDto> GetPartnerByIdAsync(Guid partnerId)
     {
-        throw new NotImplementedException();
+        var partner = await _context.Partners.FindAsync(partnerId);
+
+        if (partner is null)
+        {
+            return null;
+        }
+        
+        return PartnersMapper.ToDto(partner);
     }
 
     public Task<string> PreparePartnersForCsvExportAsync()

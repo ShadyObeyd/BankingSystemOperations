@@ -115,7 +115,7 @@ public class TransactionsService : ITransactionsService
 
     public async Task<TransactionDto> GetTransactionByIdAsync(Guid transactionId)
     {
-        var transaction = await _context.Transactions.FirstOrDefaultAsync(x => x.Id == transactionId);
+        var transaction = await _context.Transactions.FindAsync(transactionId);
 
         if (transaction is null)
         {
