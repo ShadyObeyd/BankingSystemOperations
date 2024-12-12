@@ -115,6 +115,27 @@ public class TransactionsService : ITransactionsService
         return TransactionsMapper.ToDto(transaction);
     }
 
+    public async Task<MerchantDto> GetTransactionMerchantByIdAsync(Guid transactionId)
+    {
+        var transaction = await _context.Transactions
+            .Include(t => t.Merchant)
+            .FirstOrDefaultAsync(t => t.Id == transactionId);
+
+        if (transaction is null)
+        {
+            return null;
+        }
+        
+        var merchant = transaction.Merchant;
+
+        if (merchant is null)
+        {
+            return null;
+        }
+        
+        return MerchantsMapper.ToDto(merchant);
+    }
+
     public async Task<PaginatedList<TransactionDto>> GetTransactionsAsync(int pageNumber, int pageSize, TransactionFilter filter)
     {
         IQueryable<Transaction> query;

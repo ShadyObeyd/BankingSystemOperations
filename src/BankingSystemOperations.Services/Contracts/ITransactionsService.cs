@@ -10,11 +10,13 @@ public interface ITransactionsService
 {
     Task<ValidationResult> InsertTransactionsAsync(IEnumerable<TransactionDto> transactionDtos);
     
-    IEnumerable<TransactionDto?> ReadXML(IFormFile file);
+    IEnumerable<TransactionDto> ReadXML(IFormFile file);
 
     Task<string> PrepareTransactionsForCsvExportAsync();
     
     Task<TransactionDto> GetTransactionByIdAsync(Guid transactionId);
+    
+    Task<MerchantDto> GetTransactionMerchantByIdAsync(Guid transactionId);
     
     Task<PaginatedList<TransactionDto>> GetTransactionsAsync(int pageNumber, int pageSize, TransactionFilter filter);
 }

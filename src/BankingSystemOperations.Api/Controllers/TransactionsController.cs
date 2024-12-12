@@ -62,6 +62,19 @@ public class TransactionsController : ControllerBase
         return File(fileBytes, "text/csv", "Transactions.csv");
     }
     
+    [HttpGet("{id}/Merchant")]
+    public async Task<IActionResult> GetTransactionMerchant(Guid id)
+    {
+        var merchant = await _transactionsService.GetTransactionMerchantByIdAsync(id);
+
+        if (merchant is null)
+        {
+            return NotFound("No merchant found");
+        }
+        
+        return Ok(merchant);
+    }
+    
     [HttpPost("ImportXml")]
     public async Task<IActionResult> ImportXML(IFormFile? file)
     {
