@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text;
 using BankingSystemOperations.Data.Dtos;
 using BankingSystemOperations.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
@@ -62,11 +63,34 @@ public class PartnersController : ControllerBase
     {
         var result = await _partnersService.InsertPartnerAsync(dto);
 
-        if (!string.IsNullOrEmpty(result?.ErrorMessage))
+        if (result != ValidationResult.Success)
         {
             return BadRequest(result.ErrorMessage);
         }
         
         return Created();
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> UpdatePartner([FromBody] PartnerDto dto)
+    {
+        if (dto is null)
+        {
+            return BadRequest("Invalid input");
+        }
+
+        if (!dto.Id.HasValue)
+        {
+            return BadRequest("Ivalid merchant id");
+        }
+        
+        var result = await _partnersService.UpdatePartnerAsync(dto);
+
+        if (result != ValidationResult.Success)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+        
+        return NoContent();
     }
 }

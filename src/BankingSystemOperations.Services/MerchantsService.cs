@@ -109,7 +109,7 @@ public class MerchantsService : IMerchantsService
     {
         if (dto is null)
         {
-            return new ValidationResult("Invalid merchant");
+            return new ValidationResult("Invalid input");
         }
 
         var validator = new MerchantsValidator();

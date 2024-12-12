@@ -92,4 +92,45 @@ public class PartnersService : IPartnersService
         
         return ValidationResult.Success;
     }
+
+    public async Task<ValidationResult> UpdatePartnerAsync(PartnerDto dto)
+    {
+        if (dto is null)
+        {
+            return new ValidationResult("Invalid input");
+        }
+        
+        var validator = new PartnersValidator();
+        var validationResult = await validator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors.Select(x => x.ErrorMessage);
+            return new ValidationResult(string.Join(Environment.NewLine, errors));
+        }
+        
+        if (!dto.Id.HasValue)
+        {
+            return new ValidationResult("Invalid partner id");
+        }
+        
+        var partner = await _context.Partners.FindAsync(dto.Id.Value);
+
+        if (partner is null)
+        {
+            return new ValidationResult("Partner not found");
+        }
+        
+        partner.Name = dto.Name;
+        
+        _context.Partners.Update(partner);
+        await _context.SaveChangesAsync();
+
+        return ValidationResult.Success;
+    }
+
+    public async Task<ValidationResult> DeletePartnerAsync(Guid partnerId)
+    {
+        throw new NotImplementedException();
+    }
 }

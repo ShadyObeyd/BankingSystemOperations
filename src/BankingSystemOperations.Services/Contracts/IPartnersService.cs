@@ -13,4 +13,8 @@ public interface IPartnersService
     Task<string> PreparePartnersForCsvExportAsync();
     
     Task<ValidationResult> InsertPartnerAsync(PartnerDto dto);
+    
+    Task<ValidationResult> UpdatePartnerAsync(PartnerDto dto);
+    
+    Task<ValidationResult> DeletePartnerAsync(Guid partnerId);
 }

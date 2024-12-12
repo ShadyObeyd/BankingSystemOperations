@@ -1,7 +1,7 @@
-﻿using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text;
 using BankingSystemOperations.Data.Dtos;
 using BankingSystemOperations.Services.Contracts;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystemOperations.Api.Controllers;
@@ -68,7 +68,7 @@ public class MerchantsController : ControllerBase
 
         var result = await _merchantsService.InserMerchantAsync(merchantDto);
 
-        if (!string.IsNullOrEmpty(result?.ErrorMessage))
+        if (result != ValidationResult.Success)
         {
             return BadRequest(result.ErrorMessage);
         }
@@ -91,7 +91,7 @@ public class MerchantsController : ControllerBase
         
         var result = await _merchantsService.UpdateMerchantAsync(merchantDto);
 
-        if (!string.IsNullOrEmpty(result?.ErrorMessage))
+        if (result != ValidationResult.Success)
         {
             return BadRequest(result.ErrorMessage);
         }
@@ -104,7 +104,7 @@ public class MerchantsController : ControllerBase
     {
         var result = await _merchantsService.DeleteMerchantAsync(id);
 
-        if (!string.IsNullOrEmpty(result?.ErrorMessage))
+        if (result != ValidationResult.Success)
         {
             return BadRequest(result.ErrorMessage);
         }
