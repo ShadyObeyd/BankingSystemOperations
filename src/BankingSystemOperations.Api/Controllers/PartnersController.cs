@@ -62,7 +62,7 @@ public class PartnersController : ControllerBase
     {
         var result = await _partnersService.InsertPartnerAsync(dto);
 
-        if (result?.ErrorMessage is not null)
+        if (!string.IsNullOrEmpty(result?.ErrorMessage))
         {
             return BadRequest(result.ErrorMessage);
         }

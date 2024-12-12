@@ -39,6 +39,11 @@ public class MerchantsValidator : AbstractValidator<MerchantDto>
 
     private bool BeValidUrl(string url)
     {
+        if (string.IsNullOrEmpty(url))
+        {
+            return true;
+        }
+        
         string pattern = @"^(https?:\/\/)?([\w\-]+(\.[\w\-]+)+)(:\d+)?(\/[\w\-.,@?^=%&:/~+#]*)?$";
         return Regex.IsMatch(url, pattern);
     }

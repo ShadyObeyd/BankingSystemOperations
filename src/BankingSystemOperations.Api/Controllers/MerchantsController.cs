@@ -1,4 +1,6 @@
-﻿using BankingSystemOperations.Services.Contracts;
+﻿using System.Text;
+using BankingSystemOperations.Data.Dtos;
+using BankingSystemOperations.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingSystemOperations.Api.Controllers;
@@ -38,5 +40,38 @@ public class MerchantsController : ControllerBase
         }
         
         return Ok(merchant);
+    }
+    
+    [HttpGet("ExportCsv")]
+    public async Task<IActionResult> ExportCsv()
+    {
+        var csvData = await _merchantsService.PrepareMerchantsForCsvExportAsync();
+
+        if (string.IsNullOrEmpty(csvData))
+        {
+            return NotFound("No merchants to export");
+        }
+        
+        var fileBytes = Encoding.UTF8.GetBytes(csvData);
+
+        return File(fileBytes, "text/csv", "Merchants.csv");
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> CreateMerchant([FromBody] MerchantDto merchantDto)
+    {
+        if (merchantDto is null)
+        {
+            return BadRequest("Invalid input");
+        }
+
+        var result = await _merchantsService.InserMerchantAsync(merchantDto);
+
+        if (!string.IsNullOrEmpty(result?.ErrorMessage))
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+
+        return Created();
     }
 }

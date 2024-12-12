@@ -2,6 +2,7 @@
 using BankingSystemOperations.Data;
 using BankingSystemOperations.Data.Dtos;
 using BankingSystemOperations.Data.Mappers;
+using BankingSystemOperations.Data.Validators;
 using BankingSystemOperations.Services.Contracts;
 using BankingSystemOperations.Services.Results;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,12 @@ namespace BankingSystemOperations.Services;
 public class MerchantsService : IMerchantsService
 {
     private readonly BankingOperationsContext _context;
+    private readonly ICsvService _csvService;
 
-    public MerchantsService(BankingOperationsContext context)
+    public MerchantsService(BankingOperationsContext context, ICsvService csvService)
     {
         _context = context;
+        _csvService = csvService;
     }
     
     public async Task<PaginatedList<MerchantDto>> GetMerchantsAsync(int pageNumber, int pageSize)
@@ -59,12 +62,47 @@ public class MerchantsService : IMerchantsService
 
     public async Task<string> PrepareMerchantsForCsvExportAsync()
     {
-        throw new NotImplementedException();
+        var merchants = await _context.Merchants.ToListAsync();
+        
+        var csvFormat = _csvService.PrepareCsvExport(merchants);
+        
+        return csvFormat;
     }
 
     public async Task<ValidationResult> InserMerchantAsync(MerchantDto dto)
     {
-        throw new NotImplementedException();
+        if (dto is null)
+        {
+            return new ValidationResult("Invalid merchant");
+        }
+
+        var validator = new MerchantsValidator();
+
+        var validationResult = await validator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors.Select(x => x.ErrorMessage);
+            return new ValidationResult(string.Join(Environment.NewLine, errors));
+        }
+        
+        var merchant = MerchantsMapper.ToEntity(dto);
+
+        if (dto.PartnerId.HasValue)
+        {
+            var partner = await _context.Partners.FirstOrDefaultAsync(p => p.Id == dto.PartnerId);
+
+            if (partner is not null)
+            {
+                merchant.PartnerId = partner.Id;
+                merchant.Partner = partner;
+            }
+        }
+        
+        await _context.Merchants.AddAsync(merchant);
+        await _context.SaveChangesAsync();
+        
+        return ValidationResult.Success;
     }
 
     public async Task<ValidationResult> UpdateMerchantAsync(MerchantDto dto)
