@@ -177,11 +177,17 @@ public class PartnersService : IPartnersService
     {
         var partner = await _context.Partners
             .Include(p => p.Merchants)
+            .ThenInclude(m => m.Transactions)
             .FirstOrDefaultAsync(p => p.Id == partnerId);
 
         if (partner is null)
         {
             return new ValidationResult("Partner not found");
+        }
+
+        foreach (var merchant in partner.Merchants)
+        {
+            _context.Transactions.RemoveRange(merchant.Transactions);
         }
         
         _context.Merchants.RemoveRange(partner.Merchants);
