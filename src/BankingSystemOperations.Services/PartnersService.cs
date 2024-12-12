@@ -60,6 +60,50 @@ public class PartnersService : IPartnersService
         return PartnersMapper.ToDto(partner);
     }
 
+    public async Task<PaginatedList<MerchantDto>> GetPartnerMerchantsByIdAsync(Guid partnerId, int pageNumber, int pageSize)
+    {
+        var partner = await _context.Partners
+            .Include(p => p.Merchants)
+            .FirstOrDefaultAsync(p => p.Id == partnerId);
+
+        if (partner is null)
+        {
+            return new PaginatedList<MerchantDto>
+            {
+                Items = Enumerable.Empty<MerchantDto>(),
+                TotalCount = 0,
+                TotalPages = 0
+            };
+        }
+
+        var query = partner.Merchants.AsQueryable();
+        
+        var count = await query.CountAsync();
+
+        if (count == 0)
+        {
+            return new PaginatedList<MerchantDto>
+            {
+                Items = Enumerable.Empty<MerchantDto>(),
+                TotalCount = 0,
+                TotalPages = 0
+            };
+        }
+
+        var merchants = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(m => MerchantsMapper.ToDto(m))
+            .ToListAsync();
+
+        return new PaginatedList<MerchantDto>
+        {
+            Items = merchants,
+            TotalCount = count,
+            TotalPages = (int)Math.Ceiling((double)count / pageSize)
+        };
+    }
+
     public async Task<string> PreparePartnersForCsvExportAsync()
     {
         var partners = await _context.Partners.ToListAsync();
@@ -131,17 +175,16 @@ public class PartnersService : IPartnersService
 
     public async Task<ValidationResult> DeletePartnerAsync(Guid partnerId)
     {
-        var partner = await _context.Partners.FindAsync(partnerId);
+        var partner = await _context.Partners
+            .Include(p => p.Merchants)
+            .FirstOrDefaultAsync(p => p.Id == partnerId);
 
         if (partner is null)
         {
             return new ValidationResult("Partner not found");
         }
         
-        var merchants = await _context.Merchants
-            .Where(m => m.PartnerId == partnerId).ToListAsync();
-        
-        _context.RemoveRange(merchants);
+        _context.Merchants.RemoveRange(partner.Merchants);
         _context.Partners.Remove(partner);
         
         await _context.SaveChangesAsync();

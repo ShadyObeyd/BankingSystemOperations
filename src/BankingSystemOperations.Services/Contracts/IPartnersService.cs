@@ -9,6 +9,8 @@ public interface IPartnersService
     Task<PaginatedList<PartnerDto>> GetPartnersAsync(int pageNumber, int pageSize);
     
     Task<PartnerDto> GetPartnerByIdAsync(Guid partnerId);
+    
+    Task<PaginatedList<MerchantDto>> GetPartnerMerchantsByIdAsync(Guid partnerId, int pageNumber, int pageSize);
 
     Task<string> PreparePartnersForCsvExportAsync();
     
