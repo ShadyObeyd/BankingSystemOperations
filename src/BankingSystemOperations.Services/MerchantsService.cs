@@ -149,6 +149,22 @@ public class MerchantsService : IMerchantsService
 
     public async Task<ValidationResult> DeleteMerchantAsync(Guid merchantId)
     {
-        throw new NotImplementedException();
+        var merchant = await _context.Merchants.FindAsync(merchantId);
+
+        if (merchant is null)
+        {
+            return new ValidationResult("Merchant not found");
+        }
+        
+        var transactions = await _context.Transactions
+            .Where(t => t.MerchantId == merchantId)
+            .ToListAsync();
+
+        _context.Transactions.RemoveRange(transactions);
+        _context.Merchants.Remove(merchant);
+        
+        await _context.SaveChangesAsync();
+
+        return ValidationResult.Success;
     }
 }

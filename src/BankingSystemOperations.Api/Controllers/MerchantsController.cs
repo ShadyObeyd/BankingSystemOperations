@@ -96,6 +96,19 @@ public class MerchantsController : ControllerBase
             return BadRequest(result.ErrorMessage);
         }
 
+        return NoContent();
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteMerchant(Guid id)
+    {
+        var result = await _merchantsService.DeleteMerchantAsync(id);
+
+        if (!string.IsNullOrEmpty(result?.ErrorMessage))
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+
         return Ok();
     }
 }
