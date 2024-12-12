@@ -58,6 +58,19 @@ public class MerchantsController : ControllerBase
         return File(fileBytes, "text/csv", "Merchants.csv");
     }
     
+    [HttpGet("{id}/Partner")]
+    public async Task<IActionResult> GetMerchantPartner(Guid id)
+    {
+        var partner = await _merchantsService.GetMerchantPartnerByIdAsync(id);
+
+        if (partner is null)
+        {
+            return NotFound("Partner not found");
+        }
+        
+        return Ok(partner);
+    }
+    
     [HttpPost]
     public async Task<IActionResult> CreateMerchant([FromBody] MerchantDto merchantDto)
     {

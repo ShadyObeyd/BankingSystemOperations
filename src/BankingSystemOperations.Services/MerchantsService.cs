@@ -60,6 +60,32 @@ public class MerchantsService : IMerchantsService
         return MerchantsMapper.ToDto(merchant);
     }
 
+    public async Task<PartnerDto> GetMerchantPartnerByIdAsync(Guid merchantId)
+    {
+        var merchant = await _context.Merchants
+            .Include(m => m.Partner)
+            .FirstOrDefaultAsync(m => m.Id == merchantId);
+
+        if (merchant is null)
+        {
+            return null;
+        }
+
+        var partner = merchant.Partner;
+
+        if (partner is null)
+        {
+            return null;
+        }
+
+        return PartnersMapper.ToDto(partner);
+    }
+
+    public async Task<TransactionDto> GetMerchantTranscationsByIdAsync(Guid merchantId)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<string> PrepareMerchantsForCsvExportAsync()
     {
         var merchants = await _context.Merchants.ToListAsync();

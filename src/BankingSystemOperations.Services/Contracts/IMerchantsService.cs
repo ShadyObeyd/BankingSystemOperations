@@ -9,6 +9,10 @@ public interface IMerchantsService
     Task<PaginatedList<MerchantDto>> GetMerchantsAsync(int pageNumber, int pageSize);
     
     Task<MerchantDto> GetMerchantByIdAsync(Guid merchantId);
+    
+    Task<PartnerDto> GetMerchantPartnerByIdAsync(Guid merchantId);
+    
+    Task<TransactionDto> GetMerchantTranscationsByIdAsync(Guid merchantId);
 
     Task<string> PrepareMerchantsForCsvExportAsync();
     
