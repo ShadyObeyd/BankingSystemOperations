@@ -12,7 +12,7 @@ public interface IMerchantsService
     
     Task<PartnerDto> GetMerchantPartnerByIdAsync(Guid merchantId);
     
-    Task<TransactionDto> GetMerchantTranscationsByIdAsync(Guid merchantId);
+    Task<PaginatedList<TransactionDto>> GetMerchantTranscationsByIdAsync(Guid merchantId, int pageNumber, int pageSize);
 
     Task<string> PrepareMerchantsForCsvExportAsync();
     

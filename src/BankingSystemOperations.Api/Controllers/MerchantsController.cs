@@ -71,6 +71,19 @@ public class MerchantsController : ControllerBase
         return Ok(partner);
     }
     
+    [HttpGet("{id}/Transactions")]
+    public async Task<IActionResult> GetMerchantTransactions(Guid id, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        var transactions = await _merchantsService.GetMerchantTranscationsByIdAsync(id, pageNumber, pageSize);
+
+        if (transactions.TotalCount == 0)
+        {
+            return NotFound("No transactions found");
+        }
+
+        return Ok(transactions);
+    }
+    
     [HttpPost]
     public async Task<IActionResult> CreateMerchant([FromBody] MerchantDto merchantDto)
     {

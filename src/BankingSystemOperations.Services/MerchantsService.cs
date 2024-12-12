@@ -81,9 +81,35 @@ public class MerchantsService : IMerchantsService
         return PartnersMapper.ToDto(partner);
     }
 
-    public async Task<TransactionDto> GetMerchantTranscationsByIdAsync(Guid merchantId)
+    public async Task<PaginatedList<TransactionDto>> GetMerchantTranscationsByIdAsync(Guid merchantId, int pageNumber, int pageSize)
     {
-        throw new NotImplementedException();
+        var query = _context.Transactions
+            .Where(t => t.MerchantId == merchantId);
+
+        var count = await query.CountAsync();
+
+        if (count == 0)
+        {
+            return new PaginatedList<TransactionDto>
+            {
+                Items = Enumerable.Empty<TransactionDto>(),
+                TotalCount = 0,
+                TotalPages = 0
+            };
+        }
+
+        var transactions = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(t => TransactionsMapper.ToDto(t))
+            .ToListAsync();
+
+        return new PaginatedList<TransactionDto>
+        {
+            Items = transactions,
+            TotalCount = count,
+            TotalPages = (int)Math.Ceiling((double)count / pageSize)
+        };
     }
 
     public async Task<string> PrepareMerchantsForCsvExportAsync()
