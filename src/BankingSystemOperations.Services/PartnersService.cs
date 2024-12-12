@@ -62,21 +62,8 @@ public class PartnersService : IPartnersService
 
     public async Task<PaginatedList<MerchantDto>> GetPartnerMerchantsByIdAsync(Guid partnerId, int pageNumber, int pageSize)
     {
-        var partner = await _context.Partners
-            .Include(p => p.Merchants)
-            .FirstOrDefaultAsync(p => p.Id == partnerId);
-
-        if (partner is null)
-        {
-            return new PaginatedList<MerchantDto>
-            {
-                Items = Enumerable.Empty<MerchantDto>(),
-                TotalCount = 0,
-                TotalPages = 0
-            };
-        }
-
-        var query = partner.Merchants.AsQueryable();
+        var query = _context.Merchants
+            .Where(m => m.PartnerId == partnerId);
         
         var count = await query.CountAsync();
 
