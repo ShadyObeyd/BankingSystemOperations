@@ -131,6 +131,21 @@ public class PartnersService : IPartnersService
 
     public async Task<ValidationResult> DeletePartnerAsync(Guid partnerId)
     {
-        throw new NotImplementedException();
+        var partner = await _context.Partners.FindAsync(partnerId);
+
+        if (partner is null)
+        {
+            return new ValidationResult("Partner not found");
+        }
+        
+        var merchants = await _context.Merchants
+            .Where(m => m.PartnerId == partnerId).ToListAsync();
+        
+        _context.RemoveRange(merchants);
+        _context.Partners.Remove(partner);
+        
+        await _context.SaveChangesAsync();
+        
+        return ValidationResult.Success;
     }
 }

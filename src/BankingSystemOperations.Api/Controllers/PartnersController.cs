@@ -93,4 +93,17 @@ public class PartnersController : ControllerBase
         
         return NoContent();
     }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePartner(Guid id)
+    {
+        var result = await _partnersService.DeletePartnerAsync(id);
+
+        if (result != ValidationResult.Success)
+        {
+            return BadRequest(result.ErrorMessage);
+        }
+
+        return Ok();
+    }
 }
