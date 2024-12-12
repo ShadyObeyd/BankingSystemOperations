@@ -26,7 +26,7 @@ public class TransactionsController : ControllerBase
         
         var transactions = await _transactionsService.GetTransactionsAsync(pageNumber, pageSize, filter);
 
-        if (transactions == null || transactions?.Items.Count() == 0)
+        if (transactions.Items.Count() == 0)
         {
             return NotFound("No transactions found");
         }
@@ -50,7 +50,7 @@ public class TransactionsController : ControllerBase
     [HttpGet("ExportCsv")]
     public async Task<IActionResult> ExportCsv()
     {
-        var csvData = await _transactionsService.ExportTransactionsToCsvAsync();
+        var csvData = await _transactionsService.PrepareTransactionsForCsvExportAsync();
 
         if (string.IsNullOrEmpty(csvData))
         {

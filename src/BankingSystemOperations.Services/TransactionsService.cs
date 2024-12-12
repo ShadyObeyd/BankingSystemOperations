@@ -92,7 +92,7 @@ public class TransactionsService : ITransactionsService
         return transactions;
     }
 
-    public async Task<string> ExportTransactionsToCsvAsync()
+    public async Task<string> PrepareTransactionsForCsvExportAsync()
     {
         var transactions = await _context.Transactions.ToListAsync();
 
@@ -142,7 +142,12 @@ public class TransactionsService : ITransactionsService
 
         if (count == 0)
         {
-            return null;
+            return new PaginatedList<TransactionDto>
+            {
+                Items = Enumerable.Empty<TransactionDto>(),
+                TotalPages = 0,
+                TotalCount = 0
+            };
         }
         
         var transactions = await query

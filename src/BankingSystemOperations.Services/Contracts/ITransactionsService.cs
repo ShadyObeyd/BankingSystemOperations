@@ -12,7 +12,7 @@ public interface ITransactionsService
     
     IEnumerable<TransactionDto?> ReadXML(IFormFile file);
 
-    Task<string> ExportTransactionsToCsvAsync();
+    Task<string> PrepareTransactionsForCsvExportAsync();
     
     Task<TransactionDto> GetTransactionByIdAsync(Guid transactionId);
     
