@@ -11,10 +11,12 @@ namespace BankingSystemOperations.Services;
 public class PartnersService : IPartnersService
 {
     private readonly BankingOperationsContext _context;
+    private readonly ICsvService _csvService;
 
-    public PartnersService(BankingOperationsContext context)
+    public PartnersService(BankingOperationsContext context, ICsvService csvService)
     {
         _context = context;
+        _csvService = csvService;
     }
     
     public async Task<PaginatedList<PartnerDto>> GetPartnersAsync(int pageNumber, int pageSize)
@@ -57,9 +59,13 @@ public class PartnersService : IPartnersService
         return PartnersMapper.ToDto(partner);
     }
 
-    public Task<string> PreparePartnersForCsvExportAsync()
+    public async Task<string> PreparePartnersForCsvExportAsync()
     {
-        throw new NotImplementedException();
+        var partners = await _context.Partners.ToListAsync();
+        
+        var csvFormat = _csvService.PrepareCsvExport(partners);
+
+        return csvFormat;
     }
 
     public Task<ValidationResult> InsertPartnerAsync(PartnerDto partner)

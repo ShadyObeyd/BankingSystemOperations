@@ -39,4 +39,17 @@ public class PartnersController : ControllerBase
         
         return Ok(partner);
     }
+    
+    [HttpGet("ExportCsv")]
+    public async Task<IActionResult> ExportCsv()
+    {
+        var csv = await _partnersService.PreparePartnersForCsvExportAsync();
+
+        if (string.IsNullOrEmpty(csv))
+        {
+            return NotFound("No partners to export");
+        }
+
+        return File(csv, "text/csv", "Partners.csv");
+    }
 }

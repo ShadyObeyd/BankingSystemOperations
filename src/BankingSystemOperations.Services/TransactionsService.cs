@@ -19,10 +19,12 @@ namespace BankingSystemOperations.Services;
 public class TransactionsService : ITransactionsService
 {
     private readonly BankingOperationsContext _context;
+    private readonly ICsvService _csvService;
 
-    public TransactionsService(BankingOperationsContext context)
+    public TransactionsService(BankingOperationsContext context, ICsvService csvService)
     {
         _context = context;
+        _csvService = csvService;
     }
 
     public async Task<ValidationResult> InsertTransactionsAsync(IEnumerable<TransactionDto> transactionDtos)
@@ -95,22 +97,10 @@ public class TransactionsService : ITransactionsService
     public async Task<string> PrepareTransactionsForCsvExportAsync()
     {
         var transactions = await _context.Transactions.ToListAsync();
+        
+        var csvFormat = _csvService.PrepareCsvExport(transactions);
 
-        if (transactions is null || transactions.Count == 0)
-        {
-            return string.Empty;
-        }
-        
-        StringBuilder csvFormat = new();
-        
-        csvFormat.AppendLine("Id,CreateDate,Direction,Amount,Currency,DeptorIBAN,BeneficiaryIBAN,Status,ExternalId,MerchantId");
-        
-        foreach (var transaction in transactions)
-        {
-            csvFormat.AppendLine($"{transaction.Id},{transaction.CreateDate},{transaction.Direction},{transaction.Amount},{transaction.Currency},{transaction.DeptorIBAN},{transaction.BeneficiaryIBAN},{(byte)transaction.Status},{transaction.ExternalId},{transaction.MerchantId}");
-        }
-
-        return csvFormat.ToString().Trim();
+        return csvFormat;
     }
 
     public async Task<TransactionDto> GetTransactionByIdAsync(Guid transactionId)
